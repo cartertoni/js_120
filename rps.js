@@ -65,6 +65,7 @@ const RPSGame = {
 
   human: createHuman(),
   computer: createComputer(),
+  winner: null,
 
   displayWelcomeMessage() {
     console.clear();
@@ -73,45 +74,51 @@ const RPSGame = {
 
   determineWinner() {
     if (this.human.win[this.human.move].includes(this.computer.move)) {
+      this.winner = 'human';
       this.human.score += 1;
       if (this.human.score === this.PLAY_TO_SCORE) {
         this.human.matchWinner = true;
       }
-      return 'human';
     } else if (
       this.computer.win[this.computer.move].includes(this.human.move)
     ) {
+      this.winner = 'computer';
       this.computer.score += 1;
       if (this.computer.score === this.PLAY_TO_SCORE) {
         this.computer.matchWinner = true;
       }
-      return 'computer';
     } else {
-      return 'tie';
+      this.winner = 'tie';
     }
   },
 
   displayWinner() {
     console.clear();
-    let winner = this.determineWinner();
     console.log(`You chose: ${this.human.move}`);
     console.log(`The computer chose: ${this.computer.move}`);
     console.log(
-      `${winner === 'tie' ? "It's a tie!" : `${winner} wins!`} The score is ${
-        this.human.score
-      } - ${this.computer.score}\n`
+      `${
+        this.winner === 'tie' ? "It's a tie!" : `${this.winner} wins!`
+      } The score is ${this.human.score} - ${this.computer.score}\n`
     );
   },
 
   addToHistory() {
-    let winner = this.determineWinner();
     this.human.history.push([
       this.human.move,
-      winner === 'tie' ? winner : winner === 'human' ? 'win' : 'lose',
+      this.winner === 'tie'
+        ? this.winner
+        : this.winner === 'human'
+        ? 'win'
+        : 'lose',
     ]);
     this.computer.history.push([
       this.computer.move,
-      winner === 'tie' ? winner : winner === 'computer' ? 'win' : 'lose',
+      this.winner === 'tie'
+        ? this.winner
+        : this.winner === 'computer'
+        ? 'win'
+        : 'lose',
     ]);
   },
 
@@ -154,6 +161,7 @@ const RPSGame = {
       while (true) {
         this.human.choose(this.playerType);
         this.computer.choose(this.playerType);
+        this.determineWinner();
         this.displayWinner();
         this.addToHistory();
         console.log(this.computer.history);
