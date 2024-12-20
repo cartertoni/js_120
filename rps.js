@@ -23,6 +23,7 @@ function createPlayer() {
     },
     score: 0,
     matchWinner: false,
+    history: [],
   };
 }
 
@@ -90,8 +91,9 @@ const RPSGame = {
     }
   },
 
-  displayWinner(winner) {
+  displayWinner() {
     console.clear();
+    let winner = this.determineWinner();
     console.log(`You chose: ${this.human.move}`);
     console.log(`The computer chose: ${this.computer.move}`);
     console.log(
@@ -99,6 +101,18 @@ const RPSGame = {
         this.human.score
       } - ${this.computer.score}\n`
     );
+  },
+
+  addToHistory() {
+    let winner = this.determineWinner();
+    this.human.history.push([
+      this.human.move,
+      winner === 'tie' ? winner : winner === 'human' ? 'win' : 'lose',
+    ]);
+    this.computer.history.push([
+      this.computer.move,
+      winner === 'tie' ? winner : winner === 'computer' ? 'win' : 'lose',
+    ]);
   },
 
   checkForMatchWinner() {
@@ -140,7 +154,9 @@ const RPSGame = {
       while (true) {
         this.human.choose(this.playerType);
         this.computer.choose(this.playerType);
-        this.displayWinner(this.determineWinner());
+        this.displayWinner();
+        this.addToHistory();
+        console.log(this.computer.history);
         if (this.checkForMatchWinner()) break;
       }
       this.displayMatchWinner();
