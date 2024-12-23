@@ -47,14 +47,36 @@ function createHuman() {
       let choice;
 
       while (true) {
-        console.log(`Please choose ${this.choices.join(', ')}`);
+        console.log(
+          `Please choose ${this.choices.join(
+            ', '
+          )}. Enter 'history' to view your move history.`
+        );
         choice = readline.question();
         if (this.choices.includes(choice)) break;
-        console.clear();
-        console.log('Sorry, invalid choice.\n');
+        else if (choice === 'history') {
+          console.clear();
+          this.displayHistory();
+        } else {
+          console.clear();
+          console.log('Sorry, invalid choice.\n');
+        }
       }
 
       this.move = choice;
+    },
+
+    displayHistory() {
+      if (this.history.length === 0) {
+        console.log(`No move history to display.\n`);
+      }
+      this.history.forEach(([move, result], index) => {
+        console.log(
+          `Game ${index + 1} - Choice: ${
+            move.slice(0, 1).toUpperCase() + move.slice(1)
+          } Result: ${result.slice(0, 1).toUpperCase() + result.slice(1)} \n`
+        );
+      });
     },
   };
   return Object.assign(playerObject, humanObject);
@@ -98,7 +120,11 @@ const RPSGame = {
     console.log(`The computer chose: ${this.computer.move}`);
     console.log(
       `${
-        this.winner === 'tie' ? "It's a tie!" : `${this.winner} wins!`
+        this.winner === 'tie'
+          ? "It's a tie!"
+          : `${
+              this.winner.slice(0, 1).toUpperCase() + this.winner.slice(1)
+            } wins!`
       } The score is ${this.human.score} - ${this.computer.score}\n`
     );
   },
@@ -164,7 +190,6 @@ const RPSGame = {
         this.determineWinner();
         this.displayWinner();
         this.addToHistory();
-        console.log(this.computer.history);
         if (this.checkForMatchWinner()) break;
       }
       this.displayMatchWinner();
