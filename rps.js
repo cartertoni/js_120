@@ -140,8 +140,8 @@ const RPSGame = {
         this.winner === 'tie'
           ? "It's a tie!"
           : `${
-            this.winner.slice(0, 1).toUpperCase() + this.winner.slice(1)
-          } wins!`
+              this.winner.slice(0, 1).toUpperCase() + this.winner.slice(1)
+            } wins!`
       } The score is ${this.human.score} - ${this.computer.score}\n`
     );
   },
@@ -209,8 +209,8 @@ const RPSGame = {
     while (true) {
       this.displayWelcomeMessage();
       while (true) {
-        this.human.choose(this.playerType);
-        this.computer.choose(this.playerType);
+        this.human.choose();
+        this.computer.choose();
         this.determineWinner();
         this.displayWinner();
         this.addToHistory();
