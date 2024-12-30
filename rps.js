@@ -1,13 +1,3 @@
-/*
-
-Rock: Lizard, Scissors
-Paper: Rock, Spock
-Scisssors: Paper, Lizard
-Spock: Scissors, Rock
-Lizard: Spock, Paper
-
-*/
-
 const readline = require('readline-sync');
 
 function createPlayer() {
@@ -23,7 +13,6 @@ function createPlayer() {
     },
     score: 0,
     matchWinner: false,
-    history: [],
   };
 }
 
@@ -31,11 +20,48 @@ function createComputer() {
   let playerObject = createPlayer();
 
   let computerObject = {
+    winRatio: {},
+    weightedChoices: [],
+
+    calculateWinRatio() {
+      let historyObj = {};
+      if (RPSGame.history) {
+        historyObj = RPSGame.history.reduce((acc, current) => {
+          let [humanMove, computerMove, result] = current;
+          if (acc[computerMove]) {
+            acc[computerMove].push(result);
+          } else {
+            acc[computerMove] = [result];
+          }
+          return acc;
+        }, {});
+      }
+
+      for (let key in historyObj) {
+        this.winRatio[key] =
+          historyObj[key].filter(result => result === 'computer').length /
+          historyObj[key].filter(result => result === 'computer' || 'human')
+            .length;
+      }
+    },
+
+    weightChoices() {
+      this.weightedChoices = this.choices.reduce((acc, current) => {
+        if (this.winRatio[current] > 0.6)
+          return acc.concat([current, current, current]);
+        else if (this.winRatio[current] < 0.4) return acc.concat(current);
+        else return acc.concat([current, current]);
+      }, []);
+    },
+
     choose() {
-      let randomIndex = Math.floor(Math.random() * this.choices.length);
-      this.move = this.choices[randomIndex];
+      this.calculateWinRatio();
+      this.weightChoices();
+      let randomIndex = Math.floor(Math.random() * this.weightedChoices.length);
+      this.move = this.weightedChoices[randomIndex];
     },
   };
+
   return Object.assign(playerObject, computerObject);
 }
 
@@ -56,7 +82,7 @@ function createHuman() {
         if (this.choices.includes(choice)) break;
         else if (choice === 'history') {
           console.clear();
-          this.displayHistory();
+          RPSGame.displayHistory();
         } else {
           console.clear();
           console.log('Sorry, invalid choice.\n');
@@ -65,25 +91,13 @@ function createHuman() {
 
       this.move = choice;
     },
-
-    displayHistory() {
-      if (this.history.length === 0) {
-        console.log(`No move history to display.\n`);
-      }
-      this.history.forEach(([move, result], index) => {
-        console.log(
-          `Game ${index + 1} - Choice: ${
-            move.slice(0, 1).toUpperCase() + move.slice(1)
-          } Result: ${result.slice(0, 1).toUpperCase() + result.slice(1)} \n`
-        );
-      });
-    },
   };
   return Object.assign(playerObject, humanObject);
 }
 
 const RPSGame = {
   PLAY_TO_SCORE: 5,
+  history: [],
 
   human: createHuman(),
   computer: createComputer(),
@@ -130,22 +144,22 @@ const RPSGame = {
   },
 
   addToHistory() {
-    this.human.history.push([
-      this.human.move,
-      this.winner === 'tie'
-        ? this.winner
-        : this.winner === 'human'
-        ? 'win'
-        : 'lose',
-    ]);
-    this.computer.history.push([
-      this.computer.move,
-      this.winner === 'tie'
-        ? this.winner
-        : this.winner === 'computer'
-        ? 'win'
-        : 'lose',
-    ]);
+    this.history.push([this.human.move, this.computer.move, this.winner]);
+  },
+
+  displayHistory() {
+    if (this.history.length === 0) {
+      console.log(`No move history to display.\n`);
+    }
+    this.history.forEach(([humanMove, computerMove, winner], index) => {
+      console.log(
+        `Game ${index + 1}\nHuman move: ${
+          humanMove.slice(0, 1).toUpperCase() + humanMove.slice(1)
+        }\nComputer move: ${
+          computerMove.slice(0, 1).toUpperCase() + computerMove.slice(1)
+        }\nWinner: ${winner.slice(0, 1).toUpperCase() + winner.slice(1)} \n`
+      );
+    });
   },
 
   checkForMatchWinner() {
@@ -185,6 +199,8 @@ const RPSGame = {
     while (true) {
       this.displayWelcomeMessage();
       while (true) {
+        console.log(this.computer.weightedChoices);
+        console.log(this.computer.winRatio);
         this.human.choose(this.playerType);
         this.computer.choose(this.playerType);
         this.determineWinner();
