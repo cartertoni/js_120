@@ -183,9 +183,16 @@ const RPSGame = {
   },
 
   playAgain() {
-    console.log('Would you like to play again? (y/n)');
-    let answer = readline.question();
-    return answer.toLowerCase() === 'y';
+    while (true) {
+      console.log('Would you like to play again? (y/n)');
+      let answer = readline.question();
+      if (answer.toLowerCase() === 'y' || answer.toLowerCase() === 'n') {
+        return answer.toLowerCase() === 'y';
+      } else {
+        console.clear();
+        console.log('Invalid choice.');
+      }
+    }
   },
 
   resetGame() {
@@ -199,8 +206,6 @@ const RPSGame = {
     while (true) {
       this.displayWelcomeMessage();
       while (true) {
-        console.log(this.computer.weightedChoices);
-        console.log(this.computer.winRatio);
         this.human.choose(this.playerType);
         this.computer.choose(this.playerType);
         this.determineWinner();
