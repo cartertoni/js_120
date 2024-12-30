@@ -47,10 +47,13 @@ function createComputer() {
 
     weightChoices() {
       this.weightedChoices = this.choices.reduce((acc, current) => {
-        if (this.winRatio[current] > 0.6)
+        if (this.winRatio[current] > 0.6) {
           return acc.concat([current, current, current]);
-        else if (this.winRatio[current] < 0.4) return acc.concat(current);
-        else return acc.concat([current, current]);
+        } else if (this.winRatio[current] < 0.4) {
+          return acc.concat(current);
+        } else {
+          return acc.concat([current, current]);
+        }
       }, []);
     },
 
@@ -137,8 +140,8 @@ const RPSGame = {
         this.winner === 'tie'
           ? "It's a tie!"
           : `${
-              this.winner.slice(0, 1).toUpperCase() + this.winner.slice(1)
-            } wins!`
+            this.winner.slice(0, 1).toUpperCase() + this.winner.slice(1)
+          } wins!`
       } The score is ${this.human.score} - ${this.computer.score}\n`
     );
   },
